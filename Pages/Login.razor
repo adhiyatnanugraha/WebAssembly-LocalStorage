@@ -1,0 +1,47 @@
+﻿@page "/login"
+@using Microsoft.AspNetCore.Components.Authorization
+@using NewToBlazorWasm
+@inject NavigationManager Navigation;
+@inject AuthenticationStateProvider AuthStateProvider;
+
+<h3>Login</h3>
+
+<EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="loginModel.Username" placeholder="Username" />
+    <InputText type="password" @bind-Value="loginModel.Password" placeholder="Password" />
+
+    <button type="submit">Login</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+
+    private class LoginModel
+    {
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+
+    private async Task HandleLogin()
+    {
+        // 1. Call your authentication API endpoint
+        // This is a simplified example. Your API should validate credentials and return a token/session.
+        if(loginModel.Username == "admin" || loginModel.Password == "password")
+        {
+            // 3. Cast the provider to your custom type and update the state
+                var customAuthProvider = (LocalStorageAuthenticationProvider)AuthStateProvider;
+                await customAuthProvider.UpdateAuthenticationState("admin");
+                Navigation.NavigateTo("/", true);
+        }
+        else
+        {
+            // Handle invalid login
+            Console.WriteLine("Invalid credentials");
+        }
+        
+    }
+
+}

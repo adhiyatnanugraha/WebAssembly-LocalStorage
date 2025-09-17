@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using NewToBlazorWasm
+@inject NavigationManager NavManager;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">New-To-BlazorWasm</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <AuthorizeView>
+                <Authorized>
+                    <button @onclick="Logout">Logout</button>
+                </Authorized>
+            </AuthorizeView>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+     private async Task Logout()
+    {
+        // 1. Cast the provider and update the state to null (logged out)
+        var customAuthProvider = (LocalStorageAuthenticationProvider)AuthenticationStateProvider;
+        await customAuthProvider.MarkUserAsLoggedOut();
+
+    
+        // 3. Redirect to the login page or home page
+        NavManager.NavigateTo("/login", true); // 'forceLoad: true' is important for Server apps
+    }
+}
